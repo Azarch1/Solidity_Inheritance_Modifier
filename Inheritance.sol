@@ -1,24 +1,23 @@
 pragma solidity ^0.7.4;
 
-contract inheritanceModifier {
-    mapping(address => uint) tokenBalance;
+import "./Owned.sol";
+
+contract inheritanceModifier is Owned{
+    mapping(address => uint) public tokenBalance;
     
-    address owner;
+    
     
     uint tokenPrice = 1 ether;
     
     constructor() public {
-        owner = msg.sender;
         tokenBalance[owner] = 100;
     }
     
-    function createNewTokens() public {
-        require(msg.sender == owner, "You are not the owner");
+    function createNewTokens() public onlyModifier {
         tokenBalance[owner]++;
     }
     
-    function burnToken() public {
-        require(msg.sender == owner, "You are not the owner");
+    function burnToken() public onlyModifier {
         tokenBalance[owner]--;
     }
     
@@ -32,5 +31,8 @@ contract inheritanceModifier {
         require(tokenBalance[msg.sender] >= _amount, "You do not have enough funds");
         assert(tokenBalance[_to] +_amount >= tokenBalance[_to]);
         assert(tokenBalance[msg.sender] - _amount <= tokenBalance[msg.sender]);
+        tokenBalance[msg.sender] -= _amount;
+        tokenBalance[_to] += _amount;
     }
+    
 }
